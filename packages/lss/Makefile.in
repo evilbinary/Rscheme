@@ -10,7 +10,7 @@ INSTALL_LIB=$(INSTALL)/lib
 INSTALL_INCLUDE=$(INSTALL)/include/rscheme/pkgs/lss
 
 CC=@CC@
-CFLAGS=-g -I- -I. -I$(RSCHEME_DIR)/include
+CFLAGS=-g  -I. -I$(RSCHEME_DIR)/include
 
 #
 #  `liblss.a' library

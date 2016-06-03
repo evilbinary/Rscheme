@@ -29,7 +29,7 @@ install:: $(INSTALL_DIR)/bin
 	$(INSTALL) $(PRODUCT) $(INSTALL_DIR)/bin
 
 $(INSTALL_DIR)/bin:
-	mkdir $(INSTALL_DIR)/bin
+	mkdir -p $(INSTALL_DIR)/bin
 
 clean::
 	rm -f $(OFILES) $(PRODUCT)

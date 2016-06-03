@@ -17,8 +17,8 @@ install-base::
 	if [ ! -d $(INSTALL_DIR) ] ; then mkdir -p $(INSTALL_DIR) ; fi
 	(cd install ; \
 	 find . \! \( -name CVS -prune \) -print) > .install.list
-	cat .install.list | (cd install ; cpio -oc) \
-			  | (cd ${INSTALL_DIR} ; cpio -idc)
+	cat .install.list | (cd install ; cpio -o -H newc) \
+			  | (cd ${INSTALL_DIR} ; cpio -id )
 
 clean::
 	for i in $(SUBDIRS) ; do (cd $$i && $(MAKE) clean) ; done

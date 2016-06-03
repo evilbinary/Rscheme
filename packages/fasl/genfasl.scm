@@ -219,6 +219,7 @@
 
 (define (lib-in-place? lib place)
   (or (os-file-exists? (string-append place "/lib" lib ".a"))
+  	  (os-file-exists? (string-append place "/lib" lib ".dylib"))
       (os-file-exists? (string-append place "/lib" lib ".so"))))
 
 (define *standard-lib-places* '("/lib" "/usr/lib"))

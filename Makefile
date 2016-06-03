@@ -59,8 +59,8 @@ $(TARGET_DIR):
 	rm -rf $(TARGET_DIR) ; mkdir $(TARGET_DIR)
 	(cd ${SRC_DIR}/handc ; \
          find . \! \( -name CVS -prune \) -print) > .handc.list
-	cat .handc.list | (cd ${SRC_DIR}/handc ; cpio -oc) \
-	                | (cd ${TARGET_DIR} ; cpio -idc)
+	cat .handc.list | (cd ${SRC_DIR}/handc ; cpio -o -H newc ) \
+	                | (cd ${TARGET_DIR} ; cpio -id )
 	if test -d $(TARGET_DIR)/tmp ; then : ; \
 	else mkdir $(TARGET_DIR)/tmp ; fi
 
