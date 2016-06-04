@@ -41,7 +41,7 @@ void init_stub_procs( struct FASL_Header *hdr, jump_addr stub )
  * run on intel hardware
  */
 
-#if PLATFORM_ARCH_X86_64
+#if PLATFORM_ARCH_X86_64 
 void init_stub_procs( struct FASL_Header *hdr, jump_addr stub )
 {
   static unsigned long stub_ptr;

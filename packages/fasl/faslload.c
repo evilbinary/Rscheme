@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#include <errno.h>
 #include <time.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -168,20 +169,43 @@ static void *map_it( const char *path, int fd, void *map_at, size_t len )
 }
 
 #else
+
+#ifdef PLATFORM_AIX
+#define DO_MMAP_XFLAGS ( MAP_VARIABLE )
+#else
+#define DO_MMAP_XFLAGS 0
+#endif
+
+#if defined(PLATFORM_SUNOS) || defined(__FreeBSD__) || \
+    defined(PLATFORM_IRIX) || defined(PLATFORM_BSDI) || \
+    defined(PLATFORM_BSD) || defined(PLATFORM_LINUX) || \
+    defined(PLATFORM_AIX) 
+#define DO_MMAP_SHARING MAP_SHARED
+#else
+#define DO_MMAP_SHARING MAP_PRIVATE
+#endif
+
 static void *map_it( const char *path, int fd, void *map_at, size_t len )
 {
   caddr_t rgn;
+  int  flags = DO_MMAP_XFLAGS| DO_MMAP_SHARING;
+ if (map_at) {
+    flags |= MAP_FIXED;
+  }
+  //len=(len/getpagesize()+1)*getpagesize();
   rgn = mmap( (caddr_t)map_at,
 	      len,
 	      PROT_READ|PROT_WRITE|PROT_EXEC,
-	      MAP_PRIVATE|MAP_FIXED,
+	      flags,
 	      fd,
 	      0);
-  if (rgn == (caddr_t)~0UL)
+  if (rgn == MAP_FAILED)
     {
-      fprintf( stderr, "%s: could not map at %08lx\n", 
-	       path, (unsigned long)map_at );
-      return NULL;
+      {
+        fprintf( stderr, "%s: could not map at %08lx (errno %d %s)\n", 
+  	       path, (unsigned long)map_at ,errno,strerror(errno));
+        return NULL;
+      }
     }
   return (void *)rgn;
 }
@@ -196,7 +220,7 @@ struct FASL_Header *fasl_load( const char *path, rs_bool verboseq )
 
   timepoint( 100 );
 
-  fd = open( path, O_RDONLY );
+  fd = open( path, O_RDWR); //O_RDONLY
   if (fd < 0)
     {
       perror( path );
@@ -248,9 +272,9 @@ struct FASL_Header *fasl_load( const char *path, rs_bool verboseq )
     AllocArea *nxt, *aa = h->first_alloc_area;
     while (aa)
       {
-	nxt = (AllocArea *)aa->allocfn;
-	aa->allocfn = default_alloc_obj;
-	aa = nxt;
+    	nxt = (AllocArea *)aa->allocfn;
+    	aa->allocfn = default_alloc_obj;
+    	aa = nxt;
       }
   }
   timepoint( 107 );
